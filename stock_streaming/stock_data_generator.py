@@ -1,21 +1,39 @@
 import json
 import os
 from alpaca.data.historical import StockHistoricalDataClient
-from alpaca.data.requests import StockLatestQuoteRequest, StockLatestTradeRequest
+from alpaca.data.requests import StockLatestTradeRequest
 from dotenv import load_dotenv
+from confluent_kafka import Producer
 
 load_dotenv()
 
 api_key = os.getenv('API_KEY')
 secret_key = os.getenv('SECRET_KEY')
 
-client = StockHistoricalDataClient(api_key, secret_key)
 
-# multi symbol request - single symbol is similar
-multisymbol_request_params = StockLatestTradeRequest(symbol_or_symbols=["SPY", "GLD", "TLT"])
+class StockDataGenerator():
+    def __init__(self, api_key, secret_key, stock_symbol, producer, partition_idx, topic_name):
+        self.api_key = api_key
+        self.secret_key = secret_key
+        self.stock_symbol = stock_symbol
+        self.client = StockHistoricalDataClient(api_key, secret_key)
+        self.producer = producer
+        self.partition_idx = partition_idx
+        self.topic_name = topic_name
 
-latest_multisymbol_quotes = client.get_stock_latest_trade(multisymbol_request_params)
+    def get_ltp(self):
+        multiSymbol_request_params = StockLatestTradeRequest(symbol_or_symbols=[self.stock_symbol])
+        latest_multiSymbol_quotes = self.client.get_stock_latest_trade(multiSymbol_request_params)
+        ltp = latest_multiSymbol_quotes[self.stock_symbol].price
+        ltp_bytes = str(ltp).encode('utf-8')
+        self.producer.produce(self.topic_name, key=self.stock_symbol, value=ltp_bytes, partition=self.partition_idx,)
+        self.producer.flush()
 
-gld_latest_ask_price = latest_multisymbol_quotes["TLT"].price
 
-print(gld_latest_ask_price)
+# sgd = StockDataGenerator(api_key,
+#                          secret_key,
+#                          'AAPL',
+#                          Producer,
+#                          1,
+#                          'stock')
+# sgd.get_ltp()
