@@ -2,4 +2,6 @@
 
 .\bin\windows\kafka-server-start.bat .\config\server.properties
 
-.\bin\windows\kafka-topics.bat --create --topic myFirstTopic --bootstrap-server localhost:909
+.\bin\windows\kafka-topics.bat --create --topic myFirstTopic --bootstrap-server localhost:9092
+
+.\bin\windows\kafka-console-consumer.bat --topic myFirstTopic --from-beginning --bootstrap-server localhost:9092

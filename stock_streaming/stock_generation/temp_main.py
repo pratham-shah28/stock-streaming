@@ -1,7 +1,6 @@
-from generate_price_producer import StockGenerator
+from stock_streaming.stock_generation.generate_price_producer import StockGenerator
 import os
 from dotenv import load_dotenv
-from confluent_kafka import Producer
 
 load_dotenv()
 api_key = os.getenv("API_KEY")

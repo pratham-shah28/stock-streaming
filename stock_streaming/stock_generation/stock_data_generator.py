@@ -26,8 +26,9 @@ class StockDataGenerator():
         latest_multiSymbol_quotes = self.client.get_stock_latest_trade(multiSymbol_request_params)
         ltp = latest_multiSymbol_quotes[self.stock_symbol].price
         ltp_bytes = str(ltp).encode('utf-8')
-        self.producer.produce(self.topic_name, key=self.stock_symbol, value=ltp_bytes, partition=self.partition_idx,)
+        self.producer.produce(topic=self.topic_name, key=self.stock_symbol, value=ltp_bytes, partition=self.partition_idx,)
         self.producer.flush()
+
 
 
 # sgd = StockDataGenerator(api_key,

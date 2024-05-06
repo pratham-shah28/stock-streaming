@@ -33,7 +33,7 @@ class StockGenerator():
         self.secret_key = secret_key
         # initialize the kafka topic and kafka servers
         conf = {
-            "bootstrap.servers": kafka_servers
+            "bootstrap.servers": kafka_servers,
         }
         self.generator = StockDataGenerator(self.api_key, self.secret_key, self.stock_symbol, Producer(conf), partition_idx, topic)
 
