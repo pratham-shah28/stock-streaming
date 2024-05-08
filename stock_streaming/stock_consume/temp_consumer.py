@@ -7,7 +7,7 @@ def consume_stock_data(topic_name):
         'auto.offset.reset': 'earliest'  # Start consuming from the earliest available message
     }
     topic_name = 'myFirstTopic'
-    partition_id = 1  # The partition ID to which you want to assign the consumer
+    partition_id = 0  # The partition ID to which you want to assign the consumer
     topic_partition = TopicPartition(topic_name, partition_id)
 
 
@@ -18,7 +18,6 @@ def consume_stock_data(topic_name):
     try:
         while True:
             msg = consumer.poll(timeout=1.0)  # Poll for new messages
-
             if msg is None:
                 continue
             if msg.error():

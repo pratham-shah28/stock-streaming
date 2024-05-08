@@ -20,13 +20,23 @@ class StockDataGenerator():
         self.producer = producer
         self.partition_idx = partition_idx
         self.topic_name = topic_name
+        self.multiSymbol_request_params = StockLatestTradeRequest(symbol_or_symbols=[self.stock_symbol])
 
     def get_ltp(self):
-        multiSymbol_request_params = StockLatestTradeRequest(symbol_or_symbols=[self.stock_symbol])
-        latest_multiSymbol_quotes = self.client.get_stock_latest_trade(multiSymbol_request_params)
+        latest_multiSymbol_quotes = self.client.get_stock_latest_trade(self.multiSymbol_request_params)
         ltp = latest_multiSymbol_quotes[self.stock_symbol].price
-        ltp_bytes = str(ltp).encode('utf-8')
-        self.producer.produce(topic=self.topic_name, key=self.stock_symbol, value=ltp_bytes, partition=self.partition_idx,)
+        timestamp = latest_multiSymbol_quotes[self.stock_symbol].timestamp
+        timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        data = {
+            "timestamp": timestamp_str,
+            "ltp": ltp
+        }
+        # Convert the dictionary to JSON string
+        data_json = json.dumps(data)
+        # Encode the JSON string to bytes
+        data_bytes = data_json.encode('utf-8')
+
+        self.producer.produce(topic=self.topic_name, key=self.stock_symbol, value=data_bytes, partition=self.partition_idx,)
         self.producer.flush()
 
 
