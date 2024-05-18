@@ -5,3 +5,17 @@
 .\bin\windows\kafka-topics.bat --create --topic myFirstTopic --bootstrap-server localhost:9092
 
 .\bin\windows\kafka-console-consumer.bat --topic myFirstTopic --from-beginning --bootstrap-server localhost:9092
+
+
+------- DOCKER ---------------
+docker buildx build -t stock-generation .
+
+
+docker run -d -p 9092:9092 stock-generation
+docker exec -it cassandra-docker bash
+
+
+
+------ CASSANDRA --------------
+docker run -d --name cassandra-docker -p 9842:9842 cassandra
+
